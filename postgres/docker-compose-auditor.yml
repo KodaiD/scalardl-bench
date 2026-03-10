@@ -1,0 +1,85 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: "postgres-1"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    command: >
+      postgres
+      -c default_transaction_isolation=read\ committed
+      -c max_connections=512
+      -c shared_buffers=16GB
+      -c checkpoint_timeout=30min
+      -c max_wal_size=16GB
+      -c max_locks_per_transaction=512
+    ports:
+      - "5432:5432"
+    networks:
+      - scalar-auditor-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 1s
+      timeout: 10s
+      retries: 60
+      start_period: 30s
+
+  scalardl-auditor-schema-loader:
+    image: ghcr.io/scalar-labs/scalardl-schema-loader:${SCALARDL_VERSION}
+    environment:
+      - SCHEMA_TYPE=auditor
+    volumes:
+      - ./auditor.properties:/scalardb.properties
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      - "-c"
+      - "/scalardb.properties"
+    networks:
+      - scalar-auditor-network
+    restart: on-failure
+
+  scalardl-auditor:
+    image: ghcr.io/scalar-labs/scalardl-auditor:${SCALARDL_VERSION}
+    container_name: "scalardl-samples-scalardl-auditor-1"
+    volumes:
+      - ./auditor.properties:/scalar/auditor/auditor.properties.tmpl
+      - ../fixture/auditor-key.pem:/scalar/auditor-key.pem
+    depends_on:
+      scalardl-auditor-schema-loader:
+        condition: service_completed_successfully
+    networks:
+      - scalar-auditor-network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "grpc_health_probe -addr=localhost:40051 && grpc_health_probe -addr=auditor-envoy:40051 || exit 1",
+        ]
+      interval: 1s
+      timeout: 10s
+      retries: 60
+      start_period: 10s
+
+  auditor-envoy:
+    image: ghcr.io/scalar-labs/scalar-envoy:1.6.1
+    container_name: "scalardl-samples-auditor-envoy-1"
+    ports:
+      - "9902:9901"
+      - "40051:40051"
+      - "40052:40052"
+    depends_on:
+      scalardl-auditor:
+        condition: service_started
+    environment:
+      - admin_access_log_path=/dev/stdout
+      - scalardl_address=scalardl-auditor
+      - service_listeners=scalar-service:40051,scalar-privileged:40052
+      - envoy_tls=false
+    networks:
+      - scalar-auditor-network
+
+networks:
+  scalar-auditor-network:
+    name: scalar-auditor-network

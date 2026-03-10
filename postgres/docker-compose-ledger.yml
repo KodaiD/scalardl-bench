@@ -1,0 +1,85 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: "postgres-1"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    command: >
+      postgres
+      -c default_transaction_isolation=read\ committed
+      -c max_connections=512
+      -c shared_buffers=16GB
+      -c checkpoint_timeout=30min
+      -c max_wal_size=16GB
+      -c max_locks_per_transaction=512
+    ports:
+      - "5432:5432"
+    networks:
+      - scalar-ledger-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 1s
+      timeout: 10s
+      retries: 60
+      start_period: 30s
+
+  scalardl-ledger-schema-loader:
+    image: ghcr.io/scalar-labs/scalardl-schema-loader:${SCALARDL_VERSION}
+    volumes:
+      - ./ledger.properties:/scalardb.properties
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      - "-c"
+      - "/scalardb.properties"
+      - "--coordinator"
+    networks:
+      - scalar-ledger-network
+    restart: on-failure
+
+  scalardl-ledger:
+    image: ghcr.io/scalar-labs/scalardl-ledger:${SCALARDL_VERSION}
+    container_name: "scalardl-samples-scalardl-ledger-1"
+    volumes:
+      - ./ledger.properties:/scalar/ledger/ledger.properties.tmpl
+      - ../fixture/ledger-key.pem:/scalar/ledger-key.pem
+      - ../fixture/trial-license-cert.pem:/scalar/license-cert.pem
+    depends_on:
+      scalardl-ledger-schema-loader:
+        condition: service_completed_successfully
+    networks:
+      - scalar-ledger-network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "grpc_health_probe -addr=localhost:50051 && grpc_health_probe -addr=ledger-envoy:50051 || exit 1",
+        ]
+      interval: 1s
+      timeout: 10s
+      retries: 60
+      start_period: 10s
+
+  ledger-envoy:
+    image: ghcr.io/scalar-labs/scalar-envoy:1.6.1
+    container_name: "scalardl-samples-ledger-envoy-1"
+    ports:
+      - "9901:9901"
+      - "50051:50051"
+      - "50052:50052"
+    depends_on:
+      scalardl-ledger:
+        condition: service_started
+    environment:
+      - admin_access_log_path=/dev/stdout
+      - scalardl_address=scalardl-ledger
+      - service_listeners=scalar-service:50051,scalar-privileged:50052
+      - envoy_tls=false
+    networks:
+      - scalar-ledger-network
+
+networks:
+  scalar-ledger-network:
+    name: scalar-ledger-network
