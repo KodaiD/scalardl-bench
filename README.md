@@ -2,30 +2,46 @@
 
 ## Setup
 
+Install Docker and Docker Compose.
+
+```shell
+sudo apt update && sudo apt install -y docker.io docker-compose
+```
+
+```shell
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+```shell
+git clone https://github.com/KodaiD/scalardl-bench.git
+cd scalardl-bench
+```
+
 ```shell
 echo "SCALARDL_VERSION=3.12.2" > postgres/.env
 ```
 
 ```shell
-echo "YOUR_GHCR_PAT" | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
+echo "YOUR_GHCR_PAT" | docker login ghcr.io -u KodaiD --password-stdin
 ```
 
 On the ledger side:
 
 ```shell
-docker compose -f postgres/docker-compose-ledger.yml up -d
+docker-compose -f postgres/docker-compose-ledger.yml up -d
 ```
 
 On the auditor side:
 
 ```shell
-docker compose -f postgres/docker-compose-auditor.yml up -d
+docker-compose -f postgres/docker-compose-auditor.yml up -d
 ```
 
 On the client side:
 
 ```shell
-sudo apt update && sudo apt install -y openjdk-8-jre openjdk-8-jdk
+sudo apt install -y openjdk-8-jre openjdk-8-jdk unzip
 ```
 
 ```shell
@@ -42,11 +58,29 @@ cp -r ../scalardl-samples/fixture ./
 ```
 
 ```shell
+vim build.gradle
+```
+
+```shell
 ./gradlew shadowJar
 ```
 
 ```shell
-sed -i 's|config_file = "/<PATH_TO>/client.properties"|config_file = "./fixture/client.properties"|' ycsb-benchmark-config.toml
+vim ycsb-benchmark-config.toml
+```
+
+```
+[client_config]
+config_file = "./fixture/client.properties"
+```
+
+```shell
+vim fixture/client.properties
+```
+
+```
+scalar.dl.client.server.host=<LEDGER_ADDRESS>
+scalar.dl.client.auditor.host=<AUDITOR_ADDRESS>
 ```
 
 ```shell
