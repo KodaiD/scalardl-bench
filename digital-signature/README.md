@@ -2,6 +2,42 @@
 
 ## Setup
 
+Mount the local SSD.
+
+```shell
+sudo apt update && sudo apt install mdadm --no-install-recommends
+```
+
+```shell
+find /dev/ | grep google-local-nvme-ssd
+```
+
+```shell
+sudo mdadm --create /dev/md0 --level=0 --raid-devices=2 \
+ /dev/disk/by-id/google-local-nvme-ssd-0 \
+ /dev/disk/by-id/google-local-nvme-ssd-1
+```
+
+```shell
+sudo mdadm --detail --prefer=by-id /dev/md0
+```
+
+```shell
+sudo mkfs.ext4 -F /dev/md0
+```
+
+```shell
+sudo mkdir -p /mnt/disks/ssds
+```
+
+```shell
+sudo mount /dev/md0 /mnt/disks/ssds
+```
+
+```shell
+sudo chmod a+rw /mnt/disks/ssds
+```
+
 Install Docker and Docker Compose.
 
 ```shell
@@ -35,6 +71,10 @@ docker-compose -f postgres/docker-compose-ledger.yml up -d
 On the auditor side:
 
 ```shell
+vim postgres/auditor.properties
+```
+
+```shell
 docker-compose -f postgres/docker-compose-auditor.yml up -d
 ```
 
@@ -45,7 +85,7 @@ sudo apt install -y openjdk-8-jre openjdk-8-jdk unzip
 ```
 
 ```shell
-git clone https://github.com/scalar-labs/scalardl-samples
+git clone https://github.com/KodaiD/scalardl-bench.git
 ```
 
 ```shell
@@ -54,7 +94,7 @@ cd scalardl-benchmarks
 ```
 
 ```shell
-cp -r ../scalardl-samples/fixture ./
+cp -r ../scalardl-bench/xxx/fixture ./
 ```
 
 ```shell
@@ -98,7 +138,7 @@ record_count = 1000000
 payload_size = 100
 ops_per_tx = 2
 workload = "C"
-load_concurrency = 16
+load_concurrency = 48
 load_batch_size = 1
 ```
 
@@ -116,8 +156,8 @@ load_batch_size = 1
 
 ```
 [common]
-concurrency = 4
-run_for_sec = 300
+concurrency = 1
+run_for_sec = 60
 ramp_for_sec = 60
 ```
 
