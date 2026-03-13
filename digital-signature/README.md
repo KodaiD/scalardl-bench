@@ -81,7 +81,7 @@ docker-compose -f postgres/docker-compose-auditor.yml up -d
 On the client side:
 
 ```shell
-sudo apt install -y openjdk-8-jre openjdk-8-jdk unzip
+sudo apt update && sudo apt install -y openjdk-8-jre openjdk-8-jdk unzip
 ```
 
 ```shell
@@ -94,7 +94,7 @@ cd scalardl-benchmarks
 ```
 
 ```shell
-cp -r ../scalardl-bench/xxx/fixture ./
+cp -r ../scalardl-bench/digital-signature/fixture ./
 ```
 
 ```shell
@@ -161,7 +161,7 @@ run_for_sec = 60
 ramp_for_sec = 60
 ```
 
-2. Run the benchmark:
+Run the benchmark:
 
 ```shell
 ./kelpie-1.2.4/bin/kelpie --config ycsb-benchmark-config.toml --only-pre

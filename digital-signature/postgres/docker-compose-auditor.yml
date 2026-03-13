@@ -64,24 +64,6 @@ services:
       retries: 60
       start_period: 10s
 
-  auditor-envoy:
-    image: ghcr.io/scalar-labs/scalar-envoy:1.6.1
-    container_name: "scalardl-samples-auditor-envoy-1"
-    ports:
-      - "9902:9901"
-      - "40051:40051"
-      - "40052:40052"
-    depends_on:
-      scalardl-auditor:
-        condition: service_started
-    environment:
-      - admin_access_log_path=/dev/stdout
-      - scalardl_address=scalardl-auditor
-      - service_listeners=scalar-service:40051,scalar-privileged:40052
-      - envoy_tls=false
-    networks:
-      - scalar-auditor-network
-
 networks:
   scalar-auditor-network:
     name: scalar-auditor-network

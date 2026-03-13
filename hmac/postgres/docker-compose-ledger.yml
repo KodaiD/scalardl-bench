@@ -64,24 +64,6 @@ services:
       retries: 60
       start_period: 10s
 
-  ledger-envoy:
-    image: ghcr.io/scalar-labs/scalar-envoy:1.6.1
-    container_name: "scalardl-samples-ledger-envoy-1"
-    ports:
-      - "9901:9901"
-      - "50051:50051"
-      - "50052:50052"
-    depends_on:
-      scalardl-ledger:
-        condition: service_started
-    environment:
-      - admin_access_log_path=/dev/stdout
-      - scalardl_address=scalardl-ledger
-      - service_listeners=scalar-service:50051,scalar-privileged:50052
-      - envoy_tls=false
-    networks:
-      - scalar-ledger-network
-
 networks:
   scalar-ledger-network:
     name: scalar-ledger-network
