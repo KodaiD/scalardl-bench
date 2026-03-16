@@ -44,6 +44,7 @@ services:
 
   scalardl-auditor:
     image: ghcr.io/scalar-labs/scalardl-auditor:${SCALARDL_VERSION}
+    pull_policy: never
     container_name: "scalardl-samples-scalardl-auditor-1"
     volumes:
       - ./auditor.properties:/scalar/auditor/auditor.properties.tmpl
@@ -51,6 +52,11 @@ services:
     depends_on:
       scalardl-auditor-schema-loader:
         condition: service_completed_successfully
+    ports:
+      - "40051:40051"
+      - "40052:40052"
+      - "40053:40053"
+      - "8080:8080"
     networks:
       - scalar-auditor-network
     healthcheck:

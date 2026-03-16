@@ -43,6 +43,7 @@ services:
 
   scalardl-ledger:
     image: ghcr.io/scalar-labs/scalardl-ledger:${SCALARDL_VERSION}
+    pull_policy: never
     container_name: "scalardl-samples-scalardl-ledger-1"
     volumes:
       - ./ledger.properties:/scalar/ledger/ledger.properties.tmpl
@@ -51,6 +52,11 @@ services:
     depends_on:
       scalardl-ledger-schema-loader:
         condition: service_completed_successfully
+    ports:
+      - "50051:50051"
+      - "50052:50052"
+      - "50053:50053"
+      - "8080:8080"
     networks:
       - scalar-ledger-network
     healthcheck:

@@ -65,6 +65,13 @@ echo "YOUR_GHCR_PAT" | docker login ghcr.io -u KodaiD --password-stdin
 On the ledger side:
 
 ```shell
+git clone https://github.com/scalar-labs/scalardl.git
+cd scalardl
+./gradlew :ledger:docker
+cd ../
+```
+
+```shell
 docker-compose -f postgres/docker-compose-ledger.yml up -d
 ```
 
@@ -72,6 +79,13 @@ On the auditor side:
 
 ```shell
 vim postgres/auditor.properties
+```
+
+```shell
+git clone git@github.com:scalar-labs/scalardl-enterprise.git
+cd scalardl-enterprise
+./gradlew :auditor:docker
+cd ../
 ```
 
 ```shell
