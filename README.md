@@ -125,7 +125,28 @@ cd scalardl-benchmarks
 ```
 
 ```shell
-cp -r ../scalardl-bench/digital-signature/fixture ./
+cp -r ../scalardl-bench/<MODE>/fixture ./
+```
+
+```shell
+vim fixture/client.properties
+```
+
+```shell
+vim fixture/ledger.as.client.properties
+```
+
+```shell
+vim fixture/auditor.as.client.properties
+```
+
+```shell
+VERSION=3.12.2
+curl -OL https://github.com/scalar-labs/scalardl/releases/download/v$VERSION/scalardl-java-client-sdk-$VERSION.zip
+unzip scalardl-java-client-sdk-$VERSION.zip
+mv scalardl-java-client-sdk-$VERSION client
+client/bin/scalardl register-cert --properties ./fixture/ledger.as.client.properties
+client/bin/scalardl register-cert --properties ./fixture/auditor.as.client.properties
 ```
 
 ```shell
