@@ -38,6 +38,15 @@ sudo mount /dev/md0 /mnt/disks/ssds
 sudo chmod a+rw /mnt/disks/ssds
 ```
 
+Setup Java.
+
+```shell
+curl -s "https://get.sdkman.io" | bash
+source "$HOME/.sdkman/bin/sdkman-init.sh"
+sdk install java 21.0.10-tem
+sdk install java 8.0.482-tem
+```
+
 Install Docker and Docker Compose.
 
 ```shell
@@ -65,6 +74,10 @@ echo "YOUR_GHCR_PAT" | docker login ghcr.io -u KodaiD --password-stdin
 On the ledger side:
 
 ```shell
+sdk use java 8.0.482-tem
+```
+
+```shell
 git clone https://github.com/scalar-labs/scalardl.git
 cd scalardl
 ./gradlew :ledger:docker
@@ -79,6 +92,10 @@ On the auditor side:
 
 ```shell
 vim postgres/auditor.properties
+```
+
+```shell
+sdk use java 8.0.482-tem
 ```
 
 ```shell
