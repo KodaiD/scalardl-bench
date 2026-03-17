@@ -13,7 +13,11 @@ docker-compose -f postgres/docker-compose-auditor.yml down -v
 ---
 
 ```shell
-rm -rf /mnt/disks/ssds/postgres-data
+sudo rm -rf /mnt/disks/ssds/postgres-data
+```
+
+```shell
+docker system prune -a --volumes
 ```
 
 ---
@@ -21,7 +25,7 @@ rm -rf /mnt/disks/ssds/postgres-data
 ```shell
 cd scalardl
 git checkout <TARGET_VERSION>
-./gradlew :ledger:docker
+./gradlew :ledger:docker -x test
 cd ../
 ```
 
@@ -30,7 +34,7 @@ or
 ```shell
 cd scalardl-enterprise
 git checkout <TARGET_VERSION>
-./gradlew :auditor:docker
+./gradlew :auditor:docker -x test
 cd ../
 ```
 
@@ -43,11 +47,13 @@ echo "SCALARDL_VERSION=<VERSION>" > postgres/.env
 ---
 
 ```shell
+vim postgres/.env
 docker-compose -f postgres/docker-compose-ledger.yml up -d
 ```
 
 or
 
 ```shell
+vim postgres/.env
 docker-compose -f postgres/docker-compose-auditor.yml up -d
 ``` 

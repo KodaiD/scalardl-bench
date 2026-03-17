@@ -13,7 +13,7 @@ docker-compose -f postgres/docker-compose-auditor.yml down -v
 ---
 
 ```shell
-rm -rf /mnt/disks/ssds/postgres-data
+sudo rm -rf /mnt/disks/ssds/postgres-data
 ```
 
 ```shell

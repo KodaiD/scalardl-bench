@@ -5,7 +5,7 @@
 Mount the local SSD.
 
 ```shell
-sudo apt update && sudo apt install mdadm --no-install-recommends zip unzip
+sudo apt update && sudo apt install -y mdadm --no-install-recommends zip unzip
 ```
 
 ```shell
@@ -24,17 +24,8 @@ sudo mdadm --detail --prefer=by-id /dev/md0
 
 ```shell
 sudo mkfs.ext4 -F /dev/md0
-```
-
-```shell
 sudo mkdir -p /mnt/disks/ssds
-```
-
-```shell
 sudo mount /dev/md0 /mnt/disks/ssds
-```
-
-```shell
 sudo chmod a+rw /mnt/disks/ssds
 ```
 
@@ -65,6 +56,10 @@ cd scalardl-bench
 ```
 
 ```shell
+cd xxx
+```
+
+```shell
 echo "SCALARDL_VERSION=3.12.2" > postgres/.env
 ```
 
@@ -88,7 +83,7 @@ git checkout VERSION
 ```
 
 ```shell
-./gradlew :ledger:docker
+./gradlew :ledger:docker -x test
 cd ../
 ```
 
@@ -132,9 +127,6 @@ sudo apt update && sudo apt install -y openjdk-8-jre openjdk-8-jdk unzip
 
 ```shell
 git clone https://github.com/KodaiD/scalardl-bench.git
-```
-
-```shell
 git clone https://github.com/scalar-labs/scalardl-benchmarks
 cd scalardl-benchmarks
 ```
@@ -186,15 +178,6 @@ vim ycsb-benchmark-config.toml
 ```
 [client_config]
 config_file = "./fixture/client.properties"
-```
-
-```shell
-vim fixture/client.properties
-```
-
-```
-scalar.dl.client.server.host=<LEDGER_ADDRESS>
-scalar.dl.client.auditor.host=<AUDITOR_ADDRESS>
 ```
 
 ```shell
