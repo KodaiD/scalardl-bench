@@ -5,7 +5,7 @@
 Mount the local SSD.
 
 ```shell
-sudo apt update && sudo apt install mdadm --no-install-recommends
+sudo apt update && sudo apt install mdadm --no-install-recommends zip unzip
 ```
 
 ```shell
@@ -45,6 +45,7 @@ curl -s "https://get.sdkman.io" | bash
 source "$HOME/.sdkman/bin/sdkman-init.sh"
 sdk install java 21.0.10-tem
 sdk install java 8.0.482-tem
+sdk use java 8.0.482-tem
 ```
 
 Install Docker and Docker Compose.
@@ -80,6 +81,13 @@ sdk use java 8.0.482-tem
 ```shell
 git clone https://github.com/scalar-labs/scalardl.git
 cd scalardl
+```
+
+```shell
+git checkout VERSION
+```
+
+```shell
 ./gradlew :ledger:docker
 cd ../
 ```
@@ -99,8 +107,15 @@ sdk use java 8.0.482-tem
 ```
 
 ```shell
-git clone git@github.com:scalar-labs/scalardl-enterprise.git
+git clone https://github.com/scalar-labs/scalardl-enterprise.git
 cd scalardl-enterprise
+```
+
+```shell
+git checkout VERSION
+```
+
+```shell
 ./gradlew :auditor:docker
 cd ../
 ```
@@ -142,6 +157,9 @@ vim fixture/auditor.as.client.properties
 
 ```shell
 VERSION=3.12.2
+```
+
+```shell
 curl -OL https://github.com/scalar-labs/scalardl/releases/download/v$VERSION/scalardl-java-client-sdk-$VERSION.zip
 unzip scalardl-java-client-sdk-$VERSION.zip
 mv scalardl-java-client-sdk-$VERSION client
@@ -151,6 +169,10 @@ client/bin/scalardl register-cert --properties ./fixture/auditor.as.client.prope
 
 ```shell
 vim build.gradle
+```
+
+```shell
+vim src/main/java/com/scalar/dl/benchmarks/ycsb/YcsbLoader.java
 ```
 
 ```shell
