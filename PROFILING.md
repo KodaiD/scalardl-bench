@@ -104,8 +104,30 @@ docker exec scalardl-samples-scalardl-ledger-1 /async-profiler/bin/asprof -d 60 
 
 ### Wall-clock profiling
 
+CPU profiling (`-e cpu`) は CPU 上で実行中のスレッドのみをサンプリングするため、I/O 待ちやロック待ちなどで off-CPU になっているスレッドは計測されない。Wall-clock モード (`-e wall`) はスレッドの状態（running / sleeping / blocked）に関係なく一定間隔でサンプリングするため、スレッドが実際にどこで時間を費やしているかを把握できる。
+
+**CPU profiling との使い分け:**
+
+- **CPU profiling (`-e cpu`)**: CPU バウンドなボトルネックの特定に適している。
+- **Wall-clock profiling (`-e wall`)**: I/O 待ち・ロック待ち・スリープなど off-CPU 時間を含めた全体のレイテンシ分析に適している。
+
+基本的な使い方:
+
 ```shell
 docker exec scalardl-samples-scalardl-ledger-1 /async-profiler/bin/asprof -d 60 -e wall -f /tmp/wall.html jps
+```
+
+Wall-clock モードではすべてのスレッドがサンプリング対象になるため、GC スレッドや JIT コンパイラスレッドなどのノイズが含まれる。`-t` オプションでスレッドごとにフレームグラフを分離すると分析しやすい。
+
+```shell
+docker exec scalardl-samples-scalardl-ledger-1 /async-profiler/bin/asprof -d 60 -e wall -t -f /tmp/wall.html jps
+```
+
+特定のスレッドのみをプロファイリングしたい場合は、`--filter` でスレッド名のパターンを指定できる。
+
+```shell
+# gRPC スレッドのみを対象にする例
+docker exec scalardl-samples-scalardl-ledger-1 /async-profiler/bin/asprof -d 60 -e wall --filter 'grpc-*' -f /tmp/wall.html jps
 ```
 
 ### JFR format で出力
